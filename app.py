@@ -1,23 +1,17 @@
 import os
+from adt_transformation import transform_adt_a01
 
 Tenants=['epic_north','epic_south']
 dir= './incoming'
 
-def process_file(incoming_dir):
-    for filename in os.listdir(incoming_dir):
-        file_path= os.path.join(incoming_dir, filename)
+def process_file(file_path,tenant):
         
-        if not os.path.isfile(file_path):
-            continue
-
-        if not filename.endswith('.hl7'):
-            continue
-        
-        print(f"{filename}")
-
-        file = open(file_path, 'r')
-        print(file.read())
-        file.close()
+        with open(file_path, 'r') as file:
+            msg = file.read()
+            # print(msg)
+            print(f"**************{tenant}**************")
+            bundle = transform_adt_a01(msg)
+            # print(bundle)
 
 def poll_once():
     for tenant in Tenants:
@@ -27,10 +21,13 @@ def poll_once():
             os.makedirs(incoming_dir,exist_ok=True)
             continue
 
-        try:
-            process_file(incoming_dir)
-        
-        except Exception as e:
-            print(f"Error- {e}")
+        for filename in os.listdir(incoming_dir):
+            if not filename.lower().endswith('.hl7'):
+                continue
+            file_path = os.path.join(incoming_dir, filename)
+            if not os.path.isfile(file_path):
+                continue        
+
+            process_file(file_path,tenant)
 
 poll_once()
