@@ -1,5 +1,6 @@
 import os
-from adt_transformation import transform_adt_a01
+from adt_transformations.adt_01 import transform_adt_a01
+from identify_route import identify_transform
 
 Tenants=['epic_north','epic_south']
 dir= './incoming'
@@ -10,7 +11,10 @@ def process_file(file_path,tenant):
             msg = file.read()
             # print(msg)
             print(f"**************{tenant}**************")
-            bundle = transform_adt_a01(msg)
+
+            transform_fn= identify_transform(msg)           
+            print(transform_fn)
+            bundle = transform_fn(msg)
             # print(bundle)
 
 def poll_once():
