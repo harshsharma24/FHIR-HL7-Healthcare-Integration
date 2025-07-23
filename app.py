@@ -3,7 +3,8 @@ from adt_transformations.adt_01 import transform_adt_a01
 from identify_route import identify_transform
 
 Tenants=['epic_north','epic_south']
-dir= './incoming'
+hl7_dir= './incoming/hl7'   
+x12_dir='./incoming/x12'
 
 def process_file(file_path,tenant):
         
@@ -19,11 +20,10 @@ def process_file(file_path,tenant):
 
 def poll_once():
     for tenant in Tenants:
-        incoming_dir=os.path.join(dir,tenant)
+        incoming_dir=os.path.join(hl7_dir,tenant)
+        
+        os.makedirs(incoming_dir,exist_ok=True)
 
-        if not os.path.isdir(incoming_dir):
-            os.makedirs(incoming_dir,exist_ok=True)
-            continue
 
         for filename in os.listdir(incoming_dir):
             if not filename.lower().endswith('.hl7'):
@@ -32,6 +32,17 @@ def poll_once():
             if not os.path.isfile(file_path):
                 continue        
 
+            process_file(file_path,tenant)
+
+        incoming_dir=os.path.join(x12_dir,tenant)
+        os.makedirs(incoming_dir,exist_ok=True)
+
+        for filename in os.listdir(incoming_dir):
+            if not filename.lower().endswith('.edi'):
+                continue
+            file_path = os.path.join(incoming_dir, filename)
+            if not os.path.isfile(file_path):
+                continue        
             process_file(file_path,tenant)
 
 poll_once()
